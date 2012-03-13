@@ -139,7 +139,6 @@ else
 	let liczba_stron=$y+1
 fi
 
-#echo $liczba_stron
 
 block1="<a class=\"group3\" href=\""
 block2="\" title=\"\"></a>"
