@@ -27,7 +27,11 @@ fi
 
 cd $dirpath
 
+    read -p "Czy laczyc sie z serwerem? (mozna pominac jesli w podanym katalogu sa pliki lista_plikow.txt, galeria.html i album.html) t/n     " yn
 
+	if [ $yn == "t" ] || [ $yn == "tak" ]
+	then
+	
 
 ftp -n -v ftp.spnr2siekierczyna.pl << EOT
 ascii
@@ -38,9 +42,11 @@ get /www/galeria.html galeria.html
 get /www/album.html album.html
 bye 
 EOT
-	
+
+	fi
+
 awk '{print $9}' lista_plikow.txt > lista_nazw.txt
-rm lista_plikow.txt
+
 
 while read line
 do
@@ -76,10 +82,12 @@ html=".html"
 iterator=0
 
 FILES=$dirpath$slash$star
- 
+
+lista="lista_plikow.txt"
+
 for f in $FILES
 do	
-	if [ "$f" != "$dirpath$slash$uniname" ] && [ "$f" != "$dirpath$slash$galeria" ]  && [ "$f" != "$dirpath$slash$album" ]
+	if [ "$f" != "$dirpath$slash$uniname" ] && [ "$f" != "$dirpath$slash$galeria" ]  && [ "$f" != "$dirpath$slash$album" ] && [ "$f" != "$dirpath$slash$lista" ]
 		then
 		
 		echo -e -n "Przetwarzam plik: $f ..."
@@ -138,6 +146,7 @@ if [ $z -eq $x ]
 else
 	let liczba_stron=$y+1
 fi
+
 
 
 block1="<a class=\"group3\" href=\""
@@ -322,7 +331,7 @@ EOT
 		rm album.html
 		rm -rf $uniname
 		rm $uniname$koncowka
-		
+		rm lista_plikow.txt
 	fi
 	
 
