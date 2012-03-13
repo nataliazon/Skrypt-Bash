@@ -1,12 +1,12 @@
 Uruchomienie skryptu:
-./gallmake.sh æcieıka/do/katalogu/ze/zdj«ciami unikalna_nazwa "Tytu¸ Albumu" "data albumu" "opis albumu" nazwa_pliku_na_okladke.jpg
+./gallmake.sh Å›cieÅ¼ka/do/katalogu/ze/zdjÄ™ciami unikalna_nazwa "TytuÅ‚ Albumu" "data albumu" "opis albumu" nazwa_pliku_na_okladke.jpg
 
-Skrypt tworzy i wrzuca na serwer odpowiednie pliki potrzebne do stworzenia albumu ze zdj«ciami na stronie http://spnr2siekierczyna.pl/galeria.html
+Skrypt tworzy i wrzuca na serwer odpowiednie pliki potrzebne do stworzenia albumu ze zdjÄ™ciami na stronie http://spnr2siekierczyna.pl/galeria.html
 
-1. Pobierana jest z serwera lista plik—w w katalogu www/albumy
-2. Sprawdzane jest czy unikalna_nazwa wybrana przez uıytkownika nie jest juı na tej liæcie
-3. Pliki galeria.html i album.html sˆ pobierane z serwera
-4. Pliki z podanego katalogu sˆ zmniejszane, zmieniane sˆ ich nazwy i umieszczane w podfolderze o nazwie unikalna_nazwa
-5. Do pliku galeria.html dopisywany jest odpowiedni kawa¸ek kodu z linkiem do nowego albumu
-6. Na podstawie pliku album.html sˆ generowane pliki z kolejnymi stronami albumu (w iloæci zaleınej od iloæci zdj«)
-7. Pliki sˆ wysy¸ane na serwer
+1. Pobierana jest z serwera lista plikÃ³w w katalogu www/albumy
+2. Sprawdzane jest czy unikalna_nazwa wybrana przez uÅ¼ytkownika nie jest juÅ¼ na tej liÅ›cie
+3. Pliki galeria.html i album.html sÄ… pobierane z serwera
+4. Pliki z podanego katalogu sÄ… zmniejszane, zmieniane sÄ… ich nazwy i umieszczane w podfolderze o nazwie unikalna_nazwa
+5. Do pliku galeria.html dopisywany jest odpowiedni kawaÅ‚ek kodu z linkiem do nowego albumu
+6. Na podstawie pliku album.html sÄ… generowane pliki z kolejnymi stronami albumu (w iloÅ›ci zaleÅ¼nej od iloÅ›ci zdjÄ™Ä‡)
+7. Pliki sÄ… wysyÅ‚ane na serwer
