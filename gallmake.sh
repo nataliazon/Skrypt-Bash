@@ -234,7 +234,7 @@ do
 	echo "<!-- pozostale zdjecia -->" >> tempalbum.txt
 	let r=$global_photo_end_no+1
 	
-	while [[ $r -le $iterator ]] 
+	while [[ $r -lt $iterator ]] 
 			do
 				
     			string=$block1$uniname$slash$beginning$r$big$block2
