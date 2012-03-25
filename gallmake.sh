@@ -1,10 +1,15 @@
 # usage gallmake.sh path_to_directory unique_name "album name" "album date" "album description" cover_filename
 
+user="xxx"
+password="xxx"
+
+#jesli nie podano odpowiedniej liczby parametrow, skrypt konczy sie
 if [ $# -lt 6 ]
-then echo "usage gallmake.sh path_to_directory unique_name \"album name\" \"album date\" \"album description\" cover_filename"
+then echo "Musisz podac 6 parametrow: ./gallmake.sh sciezka_do_folderu unikalna_nazwa \"Nazwa Albumu\" \"Data Albumu\" \"Opis Albumu\" nazwa_pliku_z_okladka"
 exit 2
 else
 	
+	#mozna uzyc defaultowej sciezki do miejsca gdzie trzymamy obrazki, przy uruchomieniu programu zamiast sciezki wpisujemy wtedy "default"
 	if [ "$1" = "default" ] 
 		then dirpath="/Users/nataliazon/Pictures/obrazki"
 	else
@@ -17,12 +22,14 @@ else
 	albdesc="$5"
 	albcov="$6"
 	
-	echo "||||| Directory path: $dirpath"
-	echo "||||| Unique name: $uniname"
-	echo "||||| Album name: $albname"
-	echo "||||| Album date: $albdate"
-	echo "||||| Album description: $albdesc"
-	echo "||||| Album cover filename: $albcov"
+	
+	#wyswietlamy parametry wpisane przez uzytkownika
+	echo "||||| Sciezka do wybranego katalogu: $dirpath"
+	echo "||||| Unikalna nazwa: $uniname"
+	echo "||||| Nazwa albumu: $albname"
+	echo "||||| Data albumu: $albdate"
+	echo "||||| Opis albumu: $albdesc"
+	echo "||||| Nazwa pliku z okladka: $albcov"
 fi
 
 cd $dirpath
@@ -35,7 +42,7 @@ cd $dirpath
 
 ftp -n -v ftp.spnr2siekierczyna.pl << EOT
 ascii
-user xxx xxx
+user $user $password
 prompt
 dir /www/albumy lista_plikow.txt
 get /www/galeria.html galeria.html
@@ -45,9 +52,11 @@ EOT
 
 	fi
 
+#obcinamy niepotrzebne dane i umieszczamy w nowym pliku same nazwy plikow
 awk '{print $9}' lista_plikow.txt > lista_nazw.txt
 
 
+#sprawdzamy czy wybrana nazwa rzeczywiscie jest unikalna
 while read line
 do
 	echo -e -n "Sprawdzam nazwe: $line ..."
@@ -85,13 +94,16 @@ FILES=$dirpath$slash$star
 
 lista="lista_plikow.txt"
 
+
+#zmniejszamy rozmiar zdjęć i tworzymy miniaturki (przy miniaturkach wymuszamy rozdzielczosc 183x137)
+rozsz="jpg"
 for f in $FILES
 do	
-	if [ "$f" != "$dirpath$slash$uniname" ] && [ "$f" != "$dirpath$slash$galeria" ]  && [ "$f" != "$dirpath$slash$album" ] && [ "$f" != "$dirpath$slash$lista" ]
-		then
-		
+	type=${f: -3}
+	if [ "$type" == "$rozsz" ]
+	then
 		echo -e -n "Przetwarzam plik: $f ..."
-		echo $iterator
+		#echo $iterator
 		convert $f -resize 800x800 $uniname$slash$beginning$iterator$big
 		convert $f -resize 183x137\! $uniname$slash$beginning$iterator$small
 		echo "ZROBIONE"
@@ -101,9 +113,11 @@ done
 
 
 
-
+#tworzymy obrazek okladki albumu (wymuszamy rozdzielczosc)
 convert $dirpath$slash$albcov -resize 320x230\! $uniname$slash$cover
 
+
+#tworzymy fragment html ktory odpowiada za link do albumu w pliku galeria.html
 let jeden=1
 
 part1="<div><a href=\"albumy/"
@@ -122,8 +136,8 @@ part13="</p></div></div>"
 
 whole=$part1$part2$part3$part4$part5$part6$part7$part8$part9$part10$part11$part12$part13
 
-#echo -e $whole
 
+#wstawiamy wygenerowany kod html w odpowiednie miejsce w pliku galeria.html
 sed "/items/ a\ 
 $whole" galeria.html > galeria1.html
 
@@ -131,10 +145,12 @@ rm galeria.html
 mv galeria1.html galeria.html
 
 
+#tworzymy plik z kodem html opakowujacym nowy album wzorujac sie na pliku album.html
+
 head -57 album.html > tempalbum.txt
 tail -42 album.html >> tempalbum.txt
 
-#liczymy ile jest stron
+#liczymy ile album ma miec stron
 
 let x=$iterator+3
 let y=$x/9
@@ -177,13 +193,13 @@ block14="</p></div><div id=\"album_title_text\"><p id=\"ptitle\">"
 block15="</p></div></div>"
 
 
-
+#generujemy kolejne strony albumu
 for i in $(jot $liczba_stron)
 do
 	echo -n "Przetwarzam strone numer: $i ..."
 	head -57 album.html > tempalbum.txt
 	
-
+	#jesli generujemy strone pierwszsza
 	if [ $i -eq 1 ]
 	then 
 		let page_photo_no=4
@@ -197,13 +213,14 @@ do
 		if [ $i -ne $liczba_stron ]
 		then
 			let global_photo_end_no=$global_photo_start_no+8
+		#jesli generujemy strone ostatnia
 		else
 			let j=$iterator-1
 			let global_photo_end_no=$j
 		fi
 	fi
 	
-	
+	#jesli generujemy strone pierwsza
 	if [ $i -eq 1 ]
 	then
 		albumtytul=$block13$albdate$block14$albname$block15
@@ -214,6 +231,7 @@ do
 	
 	echo "<!-- wczesniejsze zdjecia -->" >> tempalbum.txt
 	let u=0
+	#jesli sa jakies zdjecia z poprzednich stron do podlinkowania
 	if [ $wczesniejsze -ne -1 ]
 		then
 			 
@@ -295,7 +313,37 @@ done
 rm tempalbum.txt
 koncowka="*.html"
 
-    read -p "Czy wyslac wygenerowane pliki na serwer? t/n     " yn
+
+    read -p "Czy wyslac wygenerowane pliki na serwer do katalogu TEST? t/n     " yn
+
+	if [ $yn == "t" ] || [ $yn == "tak" ]
+	then
+	echo "Wysylanie"
+	testing=1
+		
+	
+		ftp -n -v ftp.spnr2siekierczyna.pl << EOT
+		ascii
+		user $user $password
+		prompt
+		cd www/test
+		put galeria.html
+		cd albumy
+		mput $uniname$koncowka
+		mkdir $uniname
+		cd $uniname
+		lcd $uniname
+		mput *.jpg
+		bye 
+EOT
+		
+	else
+	 	echo "Pliki NIE zostaly umieszczone na serwerze w katalogu TEST."
+		testing=0
+	fi
+
+
+    read -p "Czy opublikować wygenerowane pliki na serwerze? t/n     " yn
 
 	if [ $yn == "t" ] || [ $yn == "tak" ]
 	then
@@ -305,7 +353,7 @@ koncowka="*.html"
 	
 		ftp -n -v ftp.spnr2siekierczyna.pl << EOT
 		ascii
-		user xxx xxx
+		user $user $password
 		prompt
 		cd www
 		put galeria.html
@@ -319,7 +367,7 @@ koncowka="*.html"
 EOT
 		
 	else
-	 	echo "Pliki NIE zostaly umieszczone na serwerze."
+	 	echo "Pliki NIE zostaly opublikowane na serwerze."
 
 	fi
 	
@@ -334,8 +382,23 @@ EOT
 		rm lista_plikow.txt
 	fi
 	
-
-
-
 	
+	if [ $testing -eq 1 ] 
+	then	
+
+echo "Czekaj, trwa czyszczenie katalogu TEST."
+
+		ftp -n -v ftp.spnr2siekierczyna.pl << EOT
+		ascii
+		user $user $password
+		prompt
+		cd www/test/albumy	
+		cd $uniname
+		mdelete *
+		cd ..
+		rmdir $uniname
+		bye 
+EOT
+
+fi
 
