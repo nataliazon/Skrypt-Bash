@@ -97,10 +97,11 @@ lista="lista_plikow.txt"
 
 #zmniejszamy rozmiar zdjęć i tworzymy miniaturki (przy miniaturkach wymuszamy rozdzielczosc 183x137)
 rozsz="jpg"
+rozsz2="JPG"
 for f in $FILES
 do	
 	type=${f: -3}
-	if [ "$type" == "$rozsz" ]
+	if [ "$type" == "$rozsz" ] || [ "$type" == "$rozsz2" ]
 	then
 		echo -e -n "Przetwarzam plik: $f ..."
 		#echo $iterator
@@ -120,25 +121,24 @@ convert $dirpath$slash$albcov -resize 320x230\! $uniname$slash$cover
 #tworzymy fragment html ktory odpowiada za link do albumu w pliku galeria.html
 let jeden=1
 
-part1="<div><a href=\"albumy/"
+part1='<div><a href="albumy/'
 part2=$uniname$jeden$html
-part3="\"><img class=\"miniaturka\" src=\"albumy/"
+part3='"><img class="miniaturka" src="albumy/'
 part4=$uniname
-part5="/cover.jpg\" /></a><div class=\"divopis\"><a href=\"albumy/"
+part5='/cover.jpg" /></a><div class="divopis"><a href="albumy/'
 part6=$uniname$html
-part7="\"><h3 class=\"tytul\">Album: "
+part7='"><h3 class="tytul">Album: '
 part8=$albname
-part9="</h3></a><h3 class=\"data\">"
+part9='</h3></a><h3 class="data">'
 part10=$albdate
-part11="</h3><p class=\"opis\">"
+part11='</h3><p class="opis">'
 part12=$albdesc
-part13="</p></div></div>"
+part13='</p></div></div>'
 
 whole=$part1$part2$part3$part4$part5$part6$part7$part8$part9$part10$part11$part12$part13
 
-
 #wstawiamy wygenerowany kod html w odpowiednie miejsce w pliku galeria.html
-sed "/items/ a\ 
+sed -e "52a\
 $whole" galeria.html > galeria1.html
 
 rm galeria.html
@@ -194,7 +194,8 @@ block15="</p></div></div>"
 
 
 #generujemy kolejne strony albumu
-for i in $(jot $liczba_stron)
+#for i in $(jot $liczba_stron)
+for i in `seq 1 $liczba_stron`
 do
 	echo -n "Przetwarzam strone numer: $i ..."
 	head -57 album.html > tempalbum.txt
@@ -282,7 +283,8 @@ do
 	echo $poczatek >> tempalbum.txt
 	
 	
-	for e in $(jot $liczba_stron)
+	#for e in $(jot $liczba_stron)
+	for e in `seq 1 $liczba_stron`
 	do
 		
 		if [ $e -eq $i ]
@@ -347,7 +349,11 @@ EOT
 
 	if [ $yn == "t" ] || [ $yn == "tak" ]
 	then
-	echo "Wysylanie"
+	read -p "Czy jestes pewien swojej decyzji? t/n     " yn2
+	
+	    if [ $yn2 == "t" ] || [ $yn2 == "tak" ]
+	    then
+	      echo "Wysylanie"
 	
 		
 	
@@ -366,6 +372,10 @@ EOT
 		bye 
 EOT
 		
+
+
+	    fi
+	
 	else
 	 	echo "Pliki NIE zostaly opublikowane na serwerze."
 
@@ -401,4 +411,5 @@ echo "Czekaj, trwa czyszczenie katalogu TEST."
 EOT
 
 fi
+
 
